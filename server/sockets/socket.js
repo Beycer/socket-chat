@@ -29,20 +29,26 @@ io.on('connection', (client) => {
         //.to y dentro de parentesis la sala
         client.broadcast.to(data.sala).emit('listadoPersona', usuarios.getPersonasPorSala(data.sala));
 
+        //Mensaje de que alguin de unió al chat
+        client.broadcast.to(data.sala).emit('crearMensaje', crearMensaje(
+            'Administrador', `${data.nombre} se unió`
+        ));
 
-        //console.log(personas);
-
+        //console.log(personas); 
         callback(usuarios.getPersonasPorSala(data.sala));
     });
 
     //El servidor debe escuchar cuando un usuario llama ese metodo de crear mensaje
     //recibe la data que es todo el mensaje que yo quiero enviar
-    client.on('crearMensaje', (data) => {
+    client.on('crearMensaje', (data, callback) => {
 
         let persona = usuarios.getPersona(client.id);
 
         let mensaje = crearMensaje(persona.nombre, data.mensaje);
         client.broadcast.to(persona.sala).emit('crearMensaje', mensaje);
+
+        callback(mensaje);
+
     });
 
 
